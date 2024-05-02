@@ -1,33 +1,39 @@
-package com.mycompany.practice;
+package snakegame;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
+import java.util.*;
 import javax.swing.*;
-import java.util.Random;
-import java.io.*;
+import javax.swing.Timer;
 public class SnakeGame extends JPanel implements ActionListener, KeyListener{
-    private class Tile{
+    public class Tile{
         int a,b;
-        Tile(int a,int b){ this.a = a; this.b = b;}
+        Tile(int a,int b){ 
+            this.a = a; this.b = b;
+        }
     }
-    int hight,width,tilesize = 25;
-    Tile food,head; Random random;
+    char key_pressed;
+    int check1,zero=0,clr1=40,clr2=200,clr3=150,one=1,fnt=30,sub=16;
+    int hight,width,tilesize = 25,t=5;
+    Tile food,head; 
+    Random random;
     ArrayList <Tile> snakeBody; Timer gameloop;   
     int valocityX,valocityY,value;
     boolean gameOver = false;    
-    SnakeGame(int hight,int width,int time){
-        this.hight = hight; this.width = width;       
+    public SnakeGame(int hight,int width,int time){
+        this.hight = hight; 
+        this.width = width;       
         setPreferredSize(new Dimension(this.width,this.hight));
         setBackground(Color.black);addKeyListener(this);setFocusable(true);
-        head = new Tile(5,5); food = new Tile(5,5);
+        head = new Tile(t,t); food = new Tile(t,t);
         snakeBody = new ArrayList<Tile>();        
-        random = new Random(); Food();                
+        random = new Random();                 
         gameloop = new Timer(time,this);
         gameloop.start(); valocityX = 1; valocityY = 0;
     }    
     public boolean collision(Tile taile1, Tile taile2){
         return taile1.a == taile2.a && taile1.b == taile2.b;
-    }@Override
+    }
+    @Override
     public void paintComponent(Graphics gp){
         super.paintComponent(gp); draw(gp);
     }    
@@ -40,64 +46,32 @@ public class SnakeGame extends JPanel implements ActionListener, KeyListener{
     }
     public void draw2(Graphics g){
         for(int i=0;i<snakeBody.size();i++){
-            g.setColor(new Color(40, 200, 150));
+            g.setColor(new Color(clr1,clr2, clr3));
             Tile snakepart = snakeBody.get(i);
             g.fill3DRect(snakepart.a*tilesize, snakepart.b*tilesize, tilesize, tilesize,true);
-        } g.setFont(new Font("Arial",Font.PLAIN,30));
+        } g.setFont(new Font("Arial",Font.PLAIN,fnt));
         if(gameOver){
             g.setColor(Color.red);
-            g.drawString("Game Over: "+String.valueOf(snakeBody.size()),tilesize-16,tilesize);            
+            g.drawString("Game Over: "+String.valueOf(snakeBody.size()),tilesize-sub,tilesize);            
         }else{
-        g.drawString("Score: "+String.valueOf(snakeBody.size()),tilesize-16,tilesize);value = snakeBody.size();
+        g.drawString("Score: "+String.valueOf(snakeBody.size()),tilesize-sub,tilesize);value = snakeBody.size();
         }
     }
-    public void Food(){ // here the food position wil be a random number
-        food.a = random.nextInt(width/tilesize); food.b = random.nextInt(hight/tilesize);
+         
+    @Override
+    public void keyPressed(KeyEvent e) { 
+    if (e.getKeyCode()== KeyEvent.VK_UP && valocityY != one ){
+        key_pressed = 'U';valocityX = zero; valocityY = - one;             // up button to go UP        
+    }else if (e.getKeyCode()== KeyEvent.VK_DOWN && valocityY != - one){ // down button to go down
+        valocityX = zero; valocityY = one;
+    }else if (e.getKeyCode()== KeyEvent.VK_LEFT && valocityX != one){ // left button to go left
+        valocityX = - one; valocityY = zero;
+    }else if (e.getKeyCode()== KeyEvent.VK_RIGHT && valocityX !=- one){ // right button to go right
+        valocityX = one; valocityY = zero;}
     }
-    public void move(){ // by eating food our snake will be big
-        if (collision(head, food)){
-            snakeBody.add(new Tile(food.a, food.b));Food();
-        }         
-        for (int i = snakeBody.size()-1;i>=0;i--){
-        Tile snakePart = snakeBody.get(i);
-        if(i==0){snakePart.a = head.a; snakePart.b = head.b;}
-        else{Tile preSnakePart = snakeBody.get(i-1);
-            snakePart.a = preSnakePart.a; snakePart.b = preSnakePart.b;}
-        }        
-        move2();
-    }
-    public void move2(){
-        head.a += valocityX; head.b += valocityY;
-        for(int i=0;i<snakeBody.size();i++){
-            Tile snakepart = snakeBody.get(i);
-            if(collision(head,snakepart)){gameOver = true;}
-        }        
-        if(head.a*tilesize<0 || head.a*tilesize>width || head.b*tilesize<0 || head.b*tilesize>hight){
-            gameOver = true;
-        }
-    }
-@Override
-    public void actionPerformed(ActionEvent e) {
-         repaint(); move();
-         if(gameOver){ gameloop.stop();
-            JOptionPane.showMessageDialog(null, "GAME OVER\n SCORE : "+value, null, JOptionPane.PLAIN_MESSAGE);
-        try{FileWriter file = new FileWriter("C:\\Users\\HP\\Documents\\NetBeansProjects\\Practise\\Game.txt",true);
-            BufferedWriter writer = new BufferedWriter(file);
-            writer.write("Game Score : "+value+"\n");writer.close();file.close();
-        }catch(IOException ee){ ee.printStackTrace();}
-        }
-    }switch (e.getKeyCode()) {
-        case KeyEvent.VK_UP:
-             valocityX = 0;valocityY = -1;
-                    break;
-        case KeyEvent.VK_DOWN:        
-             valocityX = 0;valocityY = 1;
-                    break;
-        case KeyEvent.VK_LEFT:
-             valocityX = -1;valocityY = 0;
-                    break;
-        case KeyEvent.VK_RIGHT:
-             valocityX = 1;valocityY = 0;
-                    break;
-            }
-    }
+    @Override
+    public void keyTyped(KeyEvent e) {}@Override
+    public void keyReleased(KeyEvent e) {} 
+    @Override
+    public void actionPerformed(ActionEvent e) {}
+}
