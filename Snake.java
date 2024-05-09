@@ -4,7 +4,15 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+
 import javax.swing.JOptionPane;
+
+import snakegame.SnakeGame;
+import snakegame.SnakeGame.Tile;
 
 public class Snake extends SnakeGame implements ActionListener{
 
@@ -21,7 +29,14 @@ public class Snake extends SnakeGame implements ActionListener{
             JOptionPane.showMessageDialog(null, "GAME OVER\n SCORE : "+value, null, JOptionPane.PLAIN_MESSAGE);
         try{FileWriter file = new FileWriter("C:\\Users\\USER\\OneDrive\\Documents\\NetBeansProjects\\Game\\src\\main\\java\\com\\mycompany\\game\\Game_record.txt",true);
             BufferedWriter writer = new BufferedWriter(file);
-            writer.write("Game Score : "+value+"\n");writer.close();file.close();
+            LocalTime localtime = LocalTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss");
+            String time = localtime.format(formatter);        
+            Date date = new Date();
+            DateFormat dateformat = new SimpleDateFormat("dd:MM:YYYY");
+            String formatdate = dateformat.format(date);
+            writer.write("Game Score : "+value+" & Ending Time:"+time+" & Date:"+formatdate+"\n");
+            writer.close();file.close();
         }catch(IOException ee){ ee.printStackTrace();}
         }
     }
